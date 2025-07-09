@@ -125,7 +125,7 @@ class model_testing:
                 if dict_val["target"] == 'no': yes += 1
                 else: no += 1
                 
-        return {"num_yes": yes, "num_no": no, "result": yes / self.df.shape[0] }
+        return {"num_yes": yes, "num_no": no, "result": yes / self.df.shape[0] * 100 }
 
 
 # df = pd.read_csv("buy_computer_data.csv")
