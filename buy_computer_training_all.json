@@ -1,0 +1,51 @@
+{
+    "yes": {
+        "income": {
+            "high": 0.25,
+            "medium": 0.4166666666666667,
+            "low": 0.3333333333333333
+        },
+        "student": {
+            "no": 0.36363636363636365,
+            "yes": 0.6363636363636364
+        },
+        "credit_rating": {
+            "fair": 0.6363636363636364,
+            "excellent": 0.36363636363636365
+        },
+        "age_group": {
+            "Very Young": 0.25,
+            "Young": 0.4166666666666667,
+            "Senior": 0.3333333333333333
+        }
+    },
+    "no": {
+        "income": {
+            "high": 0.375,
+            "medium": 0.375,
+            "low": 0.25
+        },
+        "student": {
+            "no": 0.7142857142857143,
+            "yes": 0.2857142857142857
+        },
+        "credit_rating": {
+            "fair": 0.42857142857142855,
+            "excellent": 0.5714285714285714
+        },
+        "age_group": {
+            "Very Young": 0.5,
+            "Young": 0.125,
+            "Senior": 0.375
+        }
+    },
+    "target_variable_Percentage_Yes": 0.6428571428571429,
+    "target_variable_Percent_No": 0.35714285714285715,
+    "columns": [
+        "income",
+        "student",
+        "credit_rating",
+        "age_group",
+        "target"
+    ]
+}

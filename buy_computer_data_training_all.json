@@ -40,5 +40,12 @@
         }
     },
     "target_variable_Percentage_Yes": 0.6428571428571429,
-    "target_variable_Percent_No": 0.35714285714285715
+    "target_variable_Percent_No": 0.35714285714285715,
+    "columns": [
+        "income",
+        "student",
+        "credit_rating",
+        "age_group",
+        "target"
+    ]
 }
