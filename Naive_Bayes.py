@@ -1,14 +1,58 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
 import json
-import csv
 
 
 
-class UploadFile:
-    pass
+class UploadData:
+    
+    def _upload_csv(self, file_pat:str):
+        return pd.read_csv(file_pat)
+    
+    def _upload_json(self, file_pat:str):
+        with open(file_pat, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        return data
+    
+    @staticmethod
+    def upload(file:str):
+        if ".csv" in file: return UploadData()._upload_csv(file)
+        if ".json" in file: return UploadData()._upload_json(file)
+
 
 class ModelSystem:
-    pass
+    
+    def __init__(self) -> None:
+        pass
+        
+    def upload_data(self, data_pat:str, target_variable:str, str_yes:str, str_no:str, columns=None):
+        data:pd.DataFrame = UploadData.upload(data_pat)
+        self.data_dict: dict = Clean(df=data, target_variable=target_variable, str_yes=str_yes, str_no=str_no, columns=columns).activation()
+        self.data_all = self.data_dict["all"]
+        self.data_train_df = self.data_dict["train_df"]
+        self.data_test_df = self.data_dict["test_df"]
+    
+    def training(self):
+        if hasattr(self, "data_dict"):
+            training_all = model_training(df=self.data_all).activation("training_all")
+            training_75 = model_training(df=self.data_train_df).activation("training_75")
+    
+    def testing(self, model_pat):
+        if hasattr(self, "data_dict"):
+            model: dict = UploadData.upload(model_pat)
+            training = model_testing(df=self.data_test_df, model=model).run()
+            self.print_results( training=training)
+        
+    def print_results(self, training: dict):
+        print()
+        print("=== תוצאות על דאטה של בדיקה (25%)  ===")
+        print(f"אחוז הצלחה: {training['result']:.2f}%")
+        print(f"מספר הצלחות (yes): {training['num_yes']}")
+        print(f"מספר כישלונות (no): {training['num_no']}")
+
+        
+    def prediction(self):
+        pass
 
 class model_training:
     
@@ -22,6 +66,7 @@ class model_training:
         self.num_target_variable = self.df[self.target_variable].size
         self.yes_count = sum(self.df[self.target_variable] == self.yes)
         self.no_count = sum(self.df[self.target_variable] == self.no)
+        # self.a = self.df[self.target_variable].unique()[0]
     
     def _training(self) -> dict:
         model = {
@@ -68,14 +113,20 @@ class Prediction:
         
     def activation(self) -> bool:
         yes = no = 1
-        
         for category in self.parameters:
-            yes *= self.modl["yes"][category][self.parameters[category]]
-            no *= self.modl["no"][category][self.parameters[category]]
+            if category == "target":
+                continue
+            try:
+                yes *= self.modl["yes"][category][self.parameters[category]]
+                no *= self.modl["no"][category][self.parameters[category]]
+            except:
+                pass
             
         yes *= self.modl["target_variable_Percentage_Yes"]
         no *= self.modl["target_variable_Percent_No"]
         return yes > no
+    
+    
     
 
 
@@ -84,8 +135,8 @@ class Clean:
     def __init__(self, df:pd.DataFrame, target_variable:str, str_yes:str, str_no:str, columns=None) -> None:
         self.target_variable = target_variable.strip()
         self.df:pd.DataFrame = df
-        self.yes = str_yes
-        self.no = str_no
+        self.yes = str_yes.strip()
+        self.no = str_no.strip()
         self.columns = columns
         
     def activation(self) -> dict:
@@ -96,17 +147,23 @@ class Clean:
         if self.columns and len(self.columns) == self.df.shape[1]:
             self.df.columns = self.columns
         
-        self.df.rename({self.target_variable:"target"})
+        self.df.rename(columns={self.target_variable:"target"}, inplace=True)
         self.df['target'] = self.df.pop('target')
         self.df["target"] = self.df["target"].map({self.no: "no", self.yes: "yes"})
     
     def _df_split(self):
+        train_df, test_df = train_test_split(
+            self.df,
+            test_size=0.25,         # 25% לבדיקה
+            random_state=42,        # כדי שהתוצאה תהיה תמיד זהה אם מריצים שוב
+            shuffle=True,           # ערבוב הנתונים לפני הפיצול
+            stratify=self.df["target"]  # לשמור על יחס yes/no גם באימון וגם בבדיקה
+        )
         return {
-            "all": self.df,
-            "75": self.df.iloc[:int(self.df.shape[0] * 0.25),:],
-            "25": self.df.iloc[int(self.df.shape[0] * 0.25):,:]
+            "all": self.df,         # כל הדאטה (לא חובה להשתמש בזה)
+            "train_df": train_df,         # הדאטה לאימון (75%)
+            "test_df": test_df           # הדאטה לבדיקה (25%)
         }
-        
 
 class model_testing:
     
@@ -116,8 +173,9 @@ class model_testing:
         
     def run(self):
         yes = no = 0
-        for i in self.df.index:
-            dict_val = self.df.iloc[i].to_dict()
+
+        for _, row in self.df.iterrows():
+            dict_val = row.to_dict()
             if Prediction(parameters=dict_val, modl=self.model).activation():
                 if dict_val["target"] == 'yes': yes += 1
                 else: no += 1
@@ -128,41 +186,44 @@ class model_testing:
         return {"num_yes": yes, "num_no": no, "result": yes / self.df.shape[0] * 100 }
 
 
-# df = pd.read_csv("buy_computer_data.csv")
 
-# model_training(df=df, target_variable="buys_computer").activation(name="buy_computer_data")
-
-# with open("buy_computer_data.json", "r", encoding="utf-8") as file:
-#     data = json.load(file)
+if __name__ == "__main__":
+    print("=================================")
+    columns = [
+    "class", "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
+    "gill-attachment", "gill-spacing", "gill-size", "gill-color",
+    "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
+    "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
+    "ring-number", "ring-type", "spore-print-color", "population", "habitat"
+    ]
     
-# p = {"income":"high","student":"yes", "credit_rating":"fair", "age_group":"Very Young"} 
-# r = Prediction(parameters=p, modl=data).activation()
-# print(r)
+    model_system = ModelSystem()
+    model_system.upload_data(data_pat="agaricus-lepiota.csv", target_variable="class", str_yes="e", str_no="p", columns=columns)
+    model_system.training()
+    print(" ========= מודל אימון על הכול =========")
+    model_system.testing("training_all.json")
+    print(" ========= מודל אימון על 75% =========")
+    model_system.testing("training_75.json")
+    
 
+# =================================
+#  ========= מודל אימון על הכול =========
+# === תוצאות על כל הדאטה (אימון + בדיקה) ===
+# אחוז הצלחה: 95.64%
+# מספר הצלחות (yes): 7769
+# מספר כישלונות (no): 354
 
+# === תוצאות על דאטה של בדיקה (25%)  ===
+# אחוז הצלחה: 97.00%
+# מספר הצלחות (yes): 5910
+# מספר כישלונות (no): 183
+#  ========= מודל אימון על 75% =========
+# === תוצאות על כל הדאטה (אימון + בדיקה) ===
+# אחוז הצלחה: 55.58%
+# מספר הצלחות (yes): 4515
+# מספר כישלונות (no): 3608
 
-# columns = [
-#     "class", "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
-#     "gill-attachment", "gill-spacing", "gill-size", "gill-color",
-#     "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
-#     "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
-#     "ring-number", "ring-type", "spore-print-color", "population", "habitat"
-# ]
-
-# df = pd.read_csv("agaricus-lepiota.csv", header=None, names=columns)
-# df["class"] = df["class"].map({"p": "no", "e": "yes"})
-
-
-# model_training(df=df, target_variable="class").activation(name="agaricus-lepiota")
-
-# with open("agaricus-lepiota.json", "r", encoding="utf-8") as file:
-#     data = json.load(file)
-
-        
-# keys = [
-#     "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
-#     "gill-attachment", "gill-spacing", "gill-size", "gill-color",
-#     "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
-#     "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
-#     "ring-number", "ring-type", "spore-print-color", "population", "habitat"]
-
+# === תוצאות על דאטה של בדיקה (25%)  ===
+# אחוז הצלחה: 40.80%
+# מספר הצלחות (yes): 2486
+# מספר כישלונות (no): 3607
