@@ -4,7 +4,11 @@ import csv
 
 
 
+class UploadFile:
+    pass
 
+class ModelSystem:
+    pass
 
 class model_training:
     
@@ -14,12 +18,12 @@ class model_training:
         self.yes = str_yes
         self.no = str_no
 
-    def target_variable_definition(self) -> None:
+    def _target_variable_definition(self) -> None:
         self.num_target_variable = self.df[self.target_variable].size
         self.yes_count = sum(self.df[self.target_variable] == self.yes)
         self.no_count = sum(self.df[self.target_variable] == self.no)
     
-    def training(self) -> dict:
+    def _training(self) -> dict:
         model = {
             "yes":{},
             "no":{} ,
@@ -42,8 +46,8 @@ class model_training:
         return model
     
     def activation(self, name:str="model") -> dict:
-        self.target_variable_definition()
-        model = self.training()
+        self._target_variable_definition()
+        model = self._training()
         with open(file= f"{name}.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
         
@@ -53,11 +57,16 @@ class model_training:
 
 class Prediction:
     
-    def __init__(self, modl:dict, parameters: dict) -> None:
+    def __init__(self, modl:dict, parameters: dict={}, values:list=[]) -> None:
         self.modl = modl
-        self.parameters = parameters
+        self.parameters: dict = self.preparation(parameters, values)
         
-    def activation(self):
+    def preparation(self, parameters: dict={}, values:list=[]) -> dict:
+        if parameters: return parameters
+        elif values: return dict(zip([col for col in self.modl["yes"] ], values))
+        else: raise
+        
+    def activation(self) -> bool:
         yes = no = 1
         
         for category in self.parameters:
@@ -67,10 +76,11 @@ class Prediction:
         yes *= self.modl["target_variable_Percentage_Yes"]
         no *= self.modl["target_variable_Percent_No"]
         return yes > no
+    
 
 
-class Clin:
-    #  str_yes:str="yes", str_no:str="no",
+class Clean:
+
     def __init__(self, df:pd.DataFrame, target_variable:str, str_yes:str, str_no:str, columns=None) -> None:
         self.target_variable = target_variable.strip()
         self.df:pd.DataFrame = df
@@ -78,15 +88,25 @@ class Clin:
         self.no = str_no
         self.columns = columns
         
-    def activation(self):
+    def activation(self) -> dict:
+        self._clean()
+        return self._df_split()
+        
+    def _clean(self):
         if self.columns and len(self.columns) == self.df.shape[1]:
             self.df.columns = self.columns
         
         self.df.rename({self.target_variable:"target"})
-
-        df = pd.read_csv("agaricus-lepiota.csv", header=None, names=columns)
-        df["target"] = df["target"].map({self.no: "no", self.yes: "yes"})
-
+        self.df['target'] = self.df.pop('target')
+        self.df["target"] = self.df["target"].map({self.no: "no", self.yes: "yes"})
+    
+    def _df_split(self):
+        return {
+            "all": self.df,
+            "75": self.df.iloc[:int(self.df.shape[0] * 0.25),:],
+            "25": self.df.iloc[int(self.df.shape[0] * 0.25):,:]
+        }
+        
 
 class model_testing:
     
@@ -121,48 +141,28 @@ class model_testing:
 
 
 
-columns = [
-    "class", "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
-    "gill-attachment", "gill-spacing", "gill-size", "gill-color",
-    "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
-    "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
-    "ring-number", "ring-type", "spore-print-color", "population", "habitat"
-]
+# columns = [
+#     "class", "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
+#     "gill-attachment", "gill-spacing", "gill-size", "gill-color",
+#     "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
+#     "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
+#     "ring-number", "ring-type", "spore-print-color", "population", "habitat"
+# ]
 
-df = pd.read_csv("agaricus-lepiota.csv", header=None, names=columns)
-df["class"] = df["class"].map({"p": "no", "e": "yes"})
+# df = pd.read_csv("agaricus-lepiota.csv", header=None, names=columns)
+# df["class"] = df["class"].map({"p": "no", "e": "yes"})
 
 
-model_training(df=df, target_variable="class").activation(name="agaricus-lepiota")
+# model_training(df=df, target_variable="class").activation(name="agaricus-lepiota")
 
-with open("agaricus-lepiota.json", "r", encoding="utf-8") as file:
-    data = json.load(file)
+# with open("agaricus-lepiota.json", "r", encoding="utf-8") as file:
+#     data = json.load(file)
 
         
-keys = [
-    "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
-    "gill-attachment", "gill-spacing", "gill-size", "gill-color",
-    "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
-    "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
-    "ring-number", "ring-type", "spore-print-color", "population", "habitat"]
+# keys = [
+#     "cap-shape", "cap-surface", "cap-color", "bruises", "odor",
+#     "gill-attachment", "gill-spacing", "gill-size", "gill-color",
+#     "stalk-shape", "stalk-root", "stalk-surface-above-ring", "stalk-surface-below-ring",
+#     "stalk-color-above-ring", "stalk-color-below-ring", "veil-type", "veil-color",
+#     "ring-number", "ring-type", "spore-print-color", "population", "habitat"]
 
-
-with open("agaricus-lepiota.csv", newline='', encoding="utf-8") as csvfile:
-    reader = csv.reader(csvfile)
-    yes = 0
-    no = 0
-    for values in reader:
-        
-        if Prediction(parameters=dict(zip(keys, values[1:])), modl=data).activation():
-            if values[0] == 'e':
-                yes += 1
-            else:
-                no +=1
-        else:
-            if values[0] == 'p':
-                yes += 1
-            else:
-                no +=1
-                
-print(yes, "========", no)
-print(yes / (yes + no))
