@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from naive_bayes import ModelSystem
+from Model.Model_System import ModelSystem
 
 st.set_page_config(page_title="מערכת Naive Bayes", layout="centered")
 st.title("🔍 Naive Bayes")
