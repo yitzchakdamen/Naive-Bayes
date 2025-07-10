@@ -42,6 +42,7 @@ class model_training:
     def activation(self, name:str="model") -> dict:
         self._target_variable_definition()
         model = self._training()
+        model["neame"] = name
         with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
         
