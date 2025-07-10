@@ -16,6 +16,7 @@ class model_training:
         self.yes_count = sum(self.df[self.target_variable] == self.yes)
         self.no_count = sum(self.df[self.target_variable] == self.no)
         # self.a = self.df[self.target_variable].unique()[0]
+        # self.target_variable = self.df[self.target_variable].unique()
     
     def _training(self) -> dict:
         model = {
@@ -43,7 +44,7 @@ class model_training:
     def activation(self, name:str="model") -> dict:
         self._target_variable_definition()
         model = self._training()
-        with open(file= f"{name}.json", mode="w", encoding="utf-8") as file:
+        with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
         
         return model
