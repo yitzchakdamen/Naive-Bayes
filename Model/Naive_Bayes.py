@@ -5,45 +5,44 @@ import json
         
 class model_training:
     
-    def __init__(self, df:pd.DataFrame, target_variable:str="target", str_yes:str="yes", str_no:str="no") -> None:
-        self.target_variable = target_variable
-        self.df = df
-        self.yes = str_yes
-        self.no = str_no
+    def __init__(self, df:pd.DataFrame, target_variable:str="target") -> None:
+        self.target_variable: str = target_variable
+        self.df: pd.DataFrame = df
 
     def _target_variable_definition(self) -> None:
-        self.num_target_variable = self.df[self.target_variable].size
-        self.yes_count = sum(self.df[self.target_variable] == self.yes)
-        self.no_count = sum(self.df[self.target_variable] == self.no)
-        # self.a = self.df[self.target_variable].unique()[0]
-        # self.target_variable = self.df[self.target_variable].unique()
-    
+        self.num_target_variable: int = self.df[self.target_variable].size
+        self.list_target_variable = list(self.df[self.target_variable].unique())
+
     def _training(self) -> dict:
         model = {
-            "yes":{},
-            "no":{} ,
-            "target_variable_Percentage_Yes": self.yes_count / self.num_target_variable,
-            "target_variable_Percent_No": self.no_count  / self.num_target_variable,
-            "columns": list(self.df.columns)
+            "columns": list(self.df.columns),
+            "target_variable": self.list_target_variable,
             }
+        
+        for variable in self.list_target_variable:
+            model[variable] = {}
+            model[F"target_variable_Percent_{variable}"] = sum(self.df[self.target_variable] == variable) / self.num_target_variable
 
         for category in self.df:
             if category == self.target_variable:
                 continue 
             
-            model["yes"][category], model["no"][category]= {}, {}
+            for variable in self.list_target_variable:
+                model[variable][category] = {}
             
             k = self.df[category].nunique()
             
             for parameter in self.df[category].unique():
                 df_parameter: pd.Series = self.df[category] == parameter
-                model["yes"][category][parameter] = (sum((df_parameter) &  (self.df[self.target_variable] == self.yes)) + 1) / (self.yes_count + k)
-                model["no"][category][parameter] = (sum((df_parameter) &  (self.df[self.target_variable] == self.no)) + 1) / (self.no_count + k)
+                for target_variable in self.list_target_variable:
+                    model[target_variable][category][parameter] = (sum((df_parameter) &  (self.df[self.target_variable] == target_variable)) + 1) / (sum(self.df[self.target_variable] == target_variable) + k)
+
         return model
     
     def activation(self, name:str="model") -> dict:
         self._target_variable_definition()
         model = self._training()
+        model["neame"] = name
         with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
         
@@ -64,6 +63,7 @@ class Prediction:
         
     def activation(self) -> bool:
         yes = no = 1
+        
         for category in self.parameters:
             if category == "target":
                 continue
@@ -73,8 +73,9 @@ class Prediction:
             except:
                 pass
             
-        yes *= self.modl["target_variable_Percentage_Yes"]
-        no *= self.modl["target_variable_Percent_No"]
+        yes *= self.modl["target_variable_Percent_yes"]
+        no *= self.modl["target_variable_Percent_no"]
+        
         return yes > no
     
 
