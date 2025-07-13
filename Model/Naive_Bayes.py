@@ -42,7 +42,7 @@ class model_training:
     def activation(self, name:str="model") -> dict:
         self._target_variable_definition()
         model = self._training()
-        model["neame"] = name
+        model["name"] = name
         with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
         
@@ -61,22 +61,23 @@ class Prediction:
         elif values: return dict(zip([col for col in self.modl["columns"] ], values))
         else: raise
         
-    def activation(self) -> bool:
+    def activation(self) -> dict:
         yes = no = 1
-        
+
         for category in self.parameters:
             if category == "target":
                 continue
             try:
                 yes *= self.modl["yes"][category][self.parameters[category]]
                 no *= self.modl["no"][category][self.parameters[category]]
+
             except:
                 pass
             
         yes *= self.modl["target_variable_Percent_yes"]
         no *= self.modl["target_variable_Percent_no"]
         
-        return yes > no
+        return {"preparation":yes > no, "yes":yes, "no":no}
     
 
 class model_testing:
@@ -93,14 +94,14 @@ class model_testing:
             pred = Prediction(parameters=dict_val, modl=self.model).activation()
             actual = dict_val["target"] == "yes"
 
-            if pred and actual:
-                TP += 1  # True Positive
-            elif pred and not actual:
-                FP += 1  # False Positive
-            elif not pred and actual:
-                FN += 1  # False Negative
-            elif not pred and not actual:
-                TN += 1  # True Negative
+            if pred["preparation"] and actual:
+                TP += 1 
+            elif pred["preparation"] and not actual:
+                FP += 1  
+            elif not pred["preparation"] and actual:
+                FN += 1 
+            elif not pred["preparation"] and not actual:
+                TN += 1  
                 
         accuracy = (TP + TN) / (TP + TN + FP + FN)
         precision = TP / (TP + FP) if (TP + FP) > 0 else 0
@@ -113,7 +114,11 @@ class model_testing:
             "result": accuracy * 100,
             "precision": precision,
             "recall": recall,
-            "f1": f1
+            "f1": f1,
+            "True Positive": TP,
+            "True Negative": TN,
+            "False Positive": FP,
+            "False Negative": FN
         }
 
 

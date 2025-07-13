@@ -51,5 +51,6 @@
             "Senior": 0.4444444444444444
         }
     },
-    "target_variable_Percent_yes": 0.6
+    "target_variable_Percent_yes": 0.6,
+    "name": "buy_computer_data_training_75"
 }
