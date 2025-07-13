@@ -17,7 +17,14 @@ class Clean:
         else: return {}
         
     def _clean(self):
-        self.df = self.df.fillna("missing")
+        # self.df = self.df.fillna("missing")
+        
+        self.df = self.df.astype(str)
+        if "Index" in self.df.columns:
+            self.df.drop(columns=["Index"], inplace=True)
+        if "index" in self.df.columns:
+            self.df.drop(columns=["index"], inplace=True)
+
         
         if self.columns and len(self.columns) == self.df.shape[1]:
             self.df.columns = self.columns
