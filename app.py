@@ -14,7 +14,7 @@ MODELS_DIR = "./Files_model"
 model_system = ModelSystem()
 
 
-@app.get("/api/models_info/") #response_model=List[ModelInfoResponse]
+@app.get("/api/models_info/", response_model=List[ModelInfoResponse]) 
 def models_info():
     try:
         return model_system.get_info()
