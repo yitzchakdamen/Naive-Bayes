@@ -86,16 +86,6 @@ with st.expander("📁 העלאת קובץ נתונים לאימון / בדיק�
                                 st.success("הבדיקה הושלמה בהצלחה!")
                                 st.subheader("🔍 תוצאות הבדיקה")
                                 st.write(results)
-                                # st.write(f"**True Positives (TP):** {results['TP']}")
-                                # st.write(f"**True Negatives (TN):** {results['TN']}")
-                                # st.write(f"**False Positives (FP):** {results['FP']}")
-                                # st.write(f"**False Negatives (FN):** {results['FN']}")
-                                # st.write(f"**אחוז הצלחה (Accuracy):** {results['result']:.2f}")
-                                # st.write(f"**Precision:** {results['precision']:.2f}")
-                                # st.write(f"**Recall:** {results['recall']:.2f}")
-                                # st.write(f"**F1 Score:** {results['f1']:.2f}")
-
-                                # לאחר התוצאות – הסבר מפורט:
                                 print_metrics_explanation_streamlit()
 
                         except Exception as e:
@@ -107,34 +97,3 @@ with st.expander("📁 העלאת קובץ נתונים לאימון / בדיק�
                 st.warning("⚠️ יש בעיה בהעלאת הקובץ. בדוק את שמות העמודות והערכים.")
 
 st.markdown("---")
-
-st.header("🤖 חלק ב: חיזוי לפי מודל מוכן")
-with st.expander("🔮 העלאת מודל וחיזוי"):
-    uploaded_file_model = st.file_uploader("העלה קובץ JSON של מודל", type=["json"])
-
-    if uploaded_file_model:
-        model_system.upload_model(uploaded_file_model)
-        st.success("📦 המודל נטען בהצלחה!")
-
-        if "columns" in model_system.nmodel:
-            values = []
-            st.subheader("📌 הכנס ערכים עבור החיזוי:")
-            for col in model_system.nmodel["columns"]:
-                if col != model_system.nmodel.get("target"):
-                    value = st.text_input(f"הכנס ערך עבור {col}")
-                    values.append(value)
-
-            if all(values):
-                try:
-                    values = [float(v) if v.replace('.', '', 1).isdigit() else v for v in values]
-                    if st.button("🔮 בצע חיזוי"):
-                        result = model_system.prediction(values)
-                        st.success("החיזוי בוצע בהצלחה!")
-                        st.write(result)
-                except Exception as e:
-                    st.error(f"שגיאה בעיבוד הערכים: {e}")
-            else:
-                st.warning("יש למלא ערכים עבור כל המשתנים.")
-
-
-

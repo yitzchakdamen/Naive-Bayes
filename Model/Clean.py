@@ -20,6 +20,7 @@ class Clean:
         # self.df = self.df.fillna("missing")
         
         self.df = self.df.astype(str)
+        
         if "Index" in self.df.columns:
             self.df.drop(columns=["Index"], inplace=True)
         if "index" in self.df.columns:
