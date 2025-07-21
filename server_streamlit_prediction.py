@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from Model.Model_System import ModelSystem
 import requests
 
@@ -20,7 +19,7 @@ with st.expander("🔮 העלאת מודל וחיזוי"):
 
     for model in response:
         if model.get("name") == option:
-            data = {"model_name":model.get("name"), "input_data":{}}
+            data: dict = {"model_name":model.get("name"), "input_data":{}}
             st.write(model["columns_all"])
             for col in model["columns"]:
                 value = st.text_input(f"הכנס ערך עבור {col}")
