@@ -1,0 +1,10 @@
+docker volume create model_files-volume
+
+cd C:\Users\isaac\source\repos\Naive_Bayes\Model_lib
+Docker build -f ModelDockerfile -t model-lib .
+
+cd C:\Users\isaac\source\repos\Naive_Bayes\Server
+docker build -f ServerDockerfile -t prediction-server .
+
+cd C:\Users\isaac\source\repos\Naive_Bayes\Training_and_testing
+docker build -f TrainingTestingDockerfile -t training_and_testing .

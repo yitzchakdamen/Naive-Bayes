@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  model-server:
+    build: .
+    image: "prediction-server:latest"
+    volumes:
+      - model_files-volume:/app/models  
+    ports:
+      - "8030:8030"
+
+volumes:
+  model_files-volume: 

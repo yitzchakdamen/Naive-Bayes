@@ -49,18 +49,18 @@ class model_training:
 
         return model
     
-    def activation(self, name: str = "model") -> dict:
-        """
-        Run the training, save the model as a JSON file, and return the model.
-        """
-        self._target_variable_definition()
-        model = self._training()
+    def saving_model_file(self, model, name:str):
         model["name"] = name
         with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
-        
-        return model
-
+    
+    def activation(self, name: str = "model") -> None:
+        """
+        Run the training, save the model as a JSON file.
+        """
+        self._target_variable_definition()
+        model = self._training()
+        self.saving_model_file(model, name)
 
 
 class Prediction:

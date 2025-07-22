@@ -3,7 +3,7 @@ class ModelInfo:
     """
     Class to handle model information and predictions.
     """
-    MODELS_DIR = "./Files_model"
+    MODELS_DIR = "./app/Files_model"
 
     def get_model_info(self, nmodel: dict):
         """
