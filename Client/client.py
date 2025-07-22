@@ -1,5 +1,4 @@
 import streamlit as st
-from Model.Model_System import ModelSystem
 import requests
 
 st.set_page_config(page_title="מערכת Naive Bayes", layout="centered")

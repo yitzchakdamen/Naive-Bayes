@@ -1,8 +1,8 @@
-from Model.Naive_Bayes import model_training, model_testing, Prediction
-from Model.model_info import ModelInfo
+from .Naive_Bayes import model_training, model_testing, Prediction
+from .model_info import ModelInfo
 from typing import cast
-from Model.Upload import UploadData
-from Model.Clean import Clean
+from .Upload import UploadData
+from .Clean import Clean
 import pandas as pd
 import os
 
@@ -45,8 +45,15 @@ class ModelSystem:
 
     def get_info(self):
         model_info = ModelInfo()
-        return [
-            model_info.get_model_info(cast(dict,UploadData.upload(os.path.join(model_info.MODELS_DIR, file)))) 
-            for file in os.listdir(model_info.MODELS_DIR) 
-            if file.endswith(".json")]
+        list_model_info = []
+        
+        for file in os.listdir(model_info.MODELS_DIR):
+            if file.endswith(".json"):
+                model:dict = cast(dict,UploadData.upload(os.path.join(model_info.MODELS_DIR, file)))
+                info = model_info.get_model_info(model)
+                list_model_info.append(info)
+        
+        return list_model_info
+            
+
 

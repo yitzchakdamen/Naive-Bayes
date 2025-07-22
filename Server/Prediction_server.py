@@ -2,9 +2,7 @@ from fastapi import FastAPI, HTTPException
 from typing import List, Dict, Optional
 import os
 import pickle
-from Model.Upload import UploadData
-from Model.model_info import ModelInfo
-from Model.Model_System import ModelSystem
+from Model import ModelSystem
 from pydantic import BaseModel
 from Server.app_models import ModelInfoResponse, PredictionRequest
 
@@ -31,4 +29,4 @@ def prediction(request: PredictionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8030)

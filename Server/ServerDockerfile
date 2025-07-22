@@ -1,0 +1,12 @@
+FROM python:3.11
+FROM model-lib
+
+WORKDIR /app
+
+EXPOSE 8030
+
+COPY . .
+
+RUN pip3 install -r requirements.txt
+
+CMD [ "python", "Prediction_server.py" ]
