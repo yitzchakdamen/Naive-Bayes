@@ -9,6 +9,8 @@ import os
 
 class ModelSystem:
     
+    MODELS_DIR = "./Files_model"
+    
     def __init__(self) -> None:
         pass
         
@@ -31,8 +33,8 @@ class ModelSystem:
     
     def training(self, name:str):
         if self.upload_prepared():
-            model_training(df=self.data_all).activation(f"{name}_training_all")
-            model_training(df=self.data_train_df).activation(f"{name}_training_75")
+            model_training(df=self.data_all).activation(dir_fils=self.MODELS_DIR, name=f"{name}_training_all")
+            model_training(df=self.data_train_df).activation(dir_fils=self.MODELS_DIR, name=f"{name}_training_75")
     
     def testing(self):
         if self.upload_prepared() and hasattr(self, "nmodel"):
@@ -47,9 +49,9 @@ class ModelSystem:
         model_info = ModelInfo()
         list_model_info = []
         
-        for file in os.listdir(model_info.MODELS_DIR):
+        for file in os.listdir(self.MODELS_DIR):
             if file.endswith(".json"):
-                model:dict = cast(dict,UploadData.upload(os.path.join(model_info.MODELS_DIR, file)))
+                model:dict = cast(dict,UploadData.upload(os.path.join(self.MODELS_DIR, file)))
                 info = model_info.get_model_info(model)
                 list_model_info.append(info)
         

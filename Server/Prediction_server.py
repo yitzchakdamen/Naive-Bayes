@@ -4,13 +4,23 @@ import os
 import pickle
 from Model import ModelSystem
 from pydantic import BaseModel
-from Server.app_models import ModelInfoResponse, PredictionRequest
+from app_models import ModelInfoResponse, PredictionRequest
 
 app = FastAPI()
 
 MODELS_DIR = "./Files_model"
-model_system = ModelSystem()
 
+model_system = ModelSystem()
+model_system.upload_data(
+    file="agaricus-lepiota.csv",
+    target_variable="p",
+    str_yes="e",
+    str_no="p")
+                
+model_system.training("name_model")
+model_system.upload_model(f"{MODELS_DIR}/name_model_training_75.json")
+results:dict = model_system.testing()
+print(results)
 
 @app.get("/api/models_info/", response_model=List[ModelInfoResponse]) 
 def models_info():
