@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import os
 
 class model_training:
     """
@@ -49,18 +50,21 @@ class model_training:
 
         return model
     
-    def saving_model_file(self, model, name:str):
+    def saving_model_file(self, model, name:str, dir_fils:"str"):
         model["name"] = name
-        with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
+        
+        os.makedirs(dir_fils, exist_ok=True)
+        with open(file= os.path.join(dir_fils, f"{name}.json") , mode="w", encoding="utf-8") as file:
             json.dump(obj=model, fp=file, indent=4)
     
-    def activation(self, name: str = "model") -> None:
+    def activation(self,dir_fils,  name: str = "model") -> None:
         """
         Run the training, save the model as a JSON file.
         """
         self._target_variable_definition()
         model = self._training()
-        self.saving_model_file(model, name)
+        self.saving_model_file(model, name, dir_fils)
+
 
 
 class Prediction:
