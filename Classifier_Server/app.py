@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from typing import List, Dict, Optional
 import requests
 from Model import ModelSystem
-from pydantic import BaseModel
 from app_models import ModelInfoResponse, PredictionRequest
 
 app = FastAPI()

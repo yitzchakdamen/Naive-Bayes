@@ -1,9 +1,6 @@
 import pandas as pd
 import json
-import os
-import json
 import requests
-import os
 from io import BytesIO
 
 class model_training:
