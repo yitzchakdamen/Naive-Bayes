@@ -20,6 +20,9 @@ class UploadData:
 
     @staticmethod
     def upload(file):
+        if isinstance(file, dict):
+            return file
+        
         if isinstance(file, str):
             if file.endswith(".csv"):
                 return UploadData()._upload_csv(file)

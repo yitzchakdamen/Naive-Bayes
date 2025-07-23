@@ -8,11 +8,12 @@ st.write()
 st.markdown("---")
 
 
-url = "http://127.0.0.1:8000/"
+
+url_server_prediction = "http://prediction-server:8030/"
 
 st.header("🤖  חיזוי לפי מודל מוכן")
 with st.expander("🔮 העלאת מודל וחיזוי"):
-    response = requests.get(f"{url}api/models_info/")
+    response = requests.get(f"{url_server_prediction}api/models_info")
     response = response.json()
     option = st.selectbox("מה מודל ?", [model.get("name") for model in response])
 
@@ -24,7 +25,7 @@ with st.expander("🔮 העלאת מודל וחיזוי"):
                 value = st.text_input(f"הכנס ערך עבור {col}")
                 data["input_data"][col] = value
     if st.button("🔍 הפעל בדיקה"):
-        response = requests.post(f"{url}api/prediction", json=data)
+        response = requests.post(f"{url_server_prediction}api/prediction", json=data)
         st.write(response.json())
 
 

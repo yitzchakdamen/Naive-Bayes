@@ -1,5 +1,5 @@
 FROM python:3.11
-FROM model-lib
+FROM model-lib__v2
 
 WORKDIR /app
 
@@ -9,4 +9,4 @@ COPY . .
 
 RUN pip3 install -r requirements.txt
 
-CMD [ "python", "Prediction_server.py" ]
+CMD [ "python", "app.py" ]

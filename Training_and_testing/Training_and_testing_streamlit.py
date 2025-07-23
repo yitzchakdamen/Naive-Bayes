@@ -30,28 +30,39 @@ with st.expander("📁 העלאת קובץ נתונים לאימון / בדיק�
 
             if model_system.upload_prepared():
                 st.success("✅ קובץ הנתונים נטען בהצלחה!")
-
-                option = st.selectbox("מה ברצונך לבצע?", ["בחר", "🧠 אימון מודל", "🔍 בדיקת מודל"])
-                
-                if option == "🧠 אימון מודל":
+                    
+                if st.checkbox("אימון מודל על הנתונים"):
                     name_model = st.text_input("הכנס שם למודל")
                     if st.button("אמן מודל"):
-                        model_system.training(name_model)
+                        model_dict = model_system.training(name_model)
+                        
                         st.success(f"המודל '{name_model}' אומן בהצלחה!")
 
-                elif option == "🔍 בדיקת מודל":
-                    st.subheader("📦 העלאת קובץ מודל (JSON)")
-                    uploaded_model_file = st.file_uploader("בחר קובץ JSON של מודל", type=["json"], key="test_model_upload")
-
-                    if uploaded_model_file:
                         try:
-                            model_system.upload_model(uploaded_model_file)
-                            st.success("✅ המודל נטען בהצלחה!")
-                            if st.button("🔍 הפעל בדיקה"):
-                                results:dict = model_system.testing()
-                                st.success("הבדיקה הושלמה בהצלחה!")
-                                st.subheader("🔍 תוצאות הבדיקה")
-                                st.write(results)
+                            model_system.upload_model(model_dict["training_75"])
+                            st.success("✅ training by 75")
+                            results_all:dict = model_system.testing()
+                            st.success("הבדיקה הושלמה בהצלחה!")
+                            st.info("🔍 תוצאות הבדיקה")
+                            st.write(results_all)
+                            TP = results_all["TP"]
+                            TN = results_all["TN"]
+                            FP = results_all["FP"]
+                            FN = results_all["FN"]
+                            confusion_matrix_df = pd.DataFrame({"Predicted Positive": [TP, FP],"Predicted Negative": [FN, TN]}, index=["Actual Positive", "Actual Negative"])
+                            st.write(confusion_matrix_df)
+                            model_system.upload_model(model_dict["training_all"])
+                            st.success("✅ training by all")
+                            results_75:dict = model_system.testing()
+                            st.success("הבדיקה הושלמה בהצלחה!")
+                            st.info("🔍 תוצאות הבדיקה")
+                            st.write(results_75)
+                            TP = results_75["TP"]
+                            TN = results_75["TN"]
+                            FP = results_75["FP"]
+                            FN = results_75["FN"]
+                            confusion_matrix_df = pd.DataFrame({"Predicted Positive": [TP, FP],"Predicted Negative": [FN, TN]}, index=["Actual Positive", "Actual Negative"])
+                            st.write(confusion_matrix_df)
 
                         except Exception as e:
                             st.error(f"שגיאה בטעינת המודל: {e}")

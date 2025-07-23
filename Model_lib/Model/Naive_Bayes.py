@@ -1,5 +1,10 @@
 import pandas as pd
 import json
+import os
+import json
+import requests
+import os
+from io import BytesIO
 
 class model_training:
     """
@@ -49,18 +54,30 @@ class model_training:
 
         return model
     
-    def saving_model_file(self, model, name:str):
+    def saving_model_file(self, model, name: str, upload_url: str):
         model["name"] = name
-        with open(file= f"Files_model\\{name}.json", mode="w", encoding="utf-8") as file:
-            json.dump(obj=model, fp=file, indent=4)
+        json_bytes = json.dumps(model, indent=4).encode("utf-8")
+        files = {"file": (f"{name}.json", BytesIO(json_bytes), "application/json")}
+
+        try:
+            response = requests.post(upload_url, files=files)
+            response.raise_for_status()
+            print(f"Тhe model was successfully uploaded: {response.json()}")
+            return response.json()
+        except requests.RequestException as e:
+            print(f"Error sending model to server: {e}")
+            return {"error": str(e)}
+
     
-    def activation(self, name: str = "model") -> None:
+    def activation(self,upload_url:str,  name: str = "model") -> dict:
         """
         Run the training, save the model as a JSON file.
         """
         self._target_variable_definition()
         model = self._training()
-        self.saving_model_file(model, name)
+        self.saving_model_file(model, name, upload_url)
+        return model
+
 
 
 class Prediction:
@@ -144,10 +161,8 @@ class model_testing:
             "precision": precision,
             "recall": recall,
             "f1": f1,
-            "True Positive": TP,
-            "True Negative": TN,
-            "False Positive": FP,
-            "False Negative": FN
+            "TP": TP,
+            "TN": TN,
+            "FP": FP,
+            "FN": FN
         }
-
-

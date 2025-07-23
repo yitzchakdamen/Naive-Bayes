@@ -1,28 +1,26 @@
 from fastapi import FastAPI, HTTPException
 from typing import List, Dict, Optional
-import os
-import pickle
+import requests
 from Model import ModelSystem
 from pydantic import BaseModel
-from Server.app_models import ModelInfoResponse, PredictionRequest
+from app_models import ModelInfoResponse, PredictionRequest
 
 app = FastAPI()
-
-MODELS_DIR = "./Files_model"
 model_system = ModelSystem()
 
 
-@app.get("/api/models_info/", response_model=List[ModelInfoResponse]) 
-def models_info():
+@app.get("/api/models_info")
+def get_models_info():
     try:
-        return model_system.get_info()
+        return requests.get(model_system.GET_INFO_URL).json()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/prediction", response_model=dict)
 def prediction(request: PredictionRequest):
     try:
-        model_system.upload_model(os.path.join(MODELS_DIR, f"{request.model_name}.json"))
+        response = requests.get(f"{model_system.GET_FILE_URL}{request.model_name}.json")
+        model_system.upload_model(response.json())
         return model_system.prediction(parameters=request.input_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
