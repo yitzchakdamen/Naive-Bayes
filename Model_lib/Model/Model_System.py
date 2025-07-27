@@ -1,5 +1,5 @@
 from .Naive_Bayes import model_training, model_testing, Prediction
-from .model_info import ModelInfo
+from .Model_info import ModelInfo
 from typing import cast
 from .Upload import UploadData
 from .Clean import Clean
