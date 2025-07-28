@@ -1,7 +1,7 @@
 from .Naive_Bayes import model_training, model_testing, Prediction
 from .Model_info import ModelInfo
 from typing import cast
-from .Upload import UploadData
+from .Upload import Upload
 from .Clean import Clean
 import pandas as pd
 import os
@@ -18,11 +18,11 @@ class ModelSystem:
         pass
         
     def upload_data(self, file, target_variable:str, str_yes:str, str_no:str, columns=None):
-        data:pd.DataFrame = cast(pd.DataFrame, UploadData.upload(file))
+        data:pd.DataFrame = cast(pd.DataFrame, Upload.upload(file))
         self.data_dict: dict = Clean(df=data, target_variable=target_variable, str_yes=str_yes, str_no=str_no, columns=columns).activation()
     
     def upload_model(self, file):
-        data:dict = cast(dict, UploadData.upload(file))
+        data:dict = cast(dict, Upload.upload(file))
         self.nmodel = data
 
     def upload_prepared(self):
@@ -55,7 +55,7 @@ class ModelSystem:
         
         for file in os.listdir(self.MODELS_DIR):
             if file.endswith(".json"):
-                model:dict = cast(dict,UploadData.upload(os.path.join(self.MODELS_DIR, file)))
+                model:dict = cast(dict,Upload.upload(os.path.join(self.MODELS_DIR, file)))
                 info = model_info.get_model_info(model)
                 list_model_info.append(info)
         

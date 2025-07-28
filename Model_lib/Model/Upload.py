@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 
-class UploadData:
+class Upload:
     
     def _upload_csv(self, file_pat):
         return pd.read_csv(file_pat)
@@ -25,15 +25,15 @@ class UploadData:
         
         if isinstance(file, str):
             if file.endswith(".csv"):
-                return UploadData()._upload_csv(file)
+                return Upload()._upload_csv(file)
             elif file.endswith(".json"):
-                return UploadData()._upload_json(file)
+                return Upload()._upload_json(file)
 
         if hasattr(file, "name"):
             name = file.name.lower()
             if name.endswith(".csv"):
-                return UploadData()._upload_csv(file)
+                return Upload()._upload_csv(file)
             elif name.endswith(".json"):
-                return UploadData()._upload_json(file)
+                return Upload()._upload_json(file)
 
         raise ValueError("Unsupported file type. Please upload a CSV or JSON file.")
