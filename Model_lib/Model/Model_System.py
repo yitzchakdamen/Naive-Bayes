@@ -14,7 +14,7 @@ class ModelSystem:
     """System for managing model training, testing, and info."""
     
     MODELS_DIR = "./models"
-    UPLOAD_URL = "http://main:8888/upload/"
+    UPLOAD_FILE_URL = "http://main:8888/upload/"
     GET_FILE_URL = "http://main:8888/download/"
     GET_INFO_URL = "http://main:8888/models_info/"
 
@@ -47,8 +47,8 @@ class ModelSystem:
         if self.upload_prepared():
             training_all = model_training(df=self.data_all).activation()
             training_75 = model_training(df=self.data_train_df).activation()
-            self.saving_model_file(training_all, name=f"{name}_training_all", upload_url=self.UPLOAD_URL)
-            self.saving_model_file(training_75, name=f"{name}_training_75", upload_url=self.UPLOAD_URL)
+            self.saving_model_file(training_all, name=f"{name}_training_all")
+            self.saving_model_file(training_75, name=f"{name}_training_75")
             return {"training_all":training_all, "training_75": training_75}
 
     def testing(self):
@@ -75,13 +75,13 @@ class ModelSystem:
         
         return list_model_info
     
-    def saving_model_file(self, model, name: str, upload_url: str):
+    def saving_model_file(self, model, name: str):
         model["name"] = name
         json_bytes = json.dumps(model, indent=4).encode("utf-8")
         files = {"file": (f"{name}.json", BytesIO(json_bytes), "application/json")}
 
         try:
-            response = requests.post(upload_url, files=files)
+            response = requests.post(self.UPLOAD_FILE_URL, files=files)
             response.raise_for_status()
             print(f"Тhe model was successfully uploaded: {response.json()}")
             return response.json()
