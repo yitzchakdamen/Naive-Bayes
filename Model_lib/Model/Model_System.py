@@ -5,6 +5,9 @@ from .Upload import Upload
 from .Clean import Clean
 import pandas as pd
 import os
+import requests
+import json
+from io import BytesIO
 
 
 class ModelSystem:
@@ -36,8 +39,10 @@ class ModelSystem:
     
     def training(self, name:str):
         if self.upload_prepared():
-            training_all = model_training(df=self.data_all).activation(upload_url=self.UPLOAD_URL, name=f"{name}_training_all")
-            training_75 = model_training(df=self.data_train_df).activation(upload_url=self.UPLOAD_URL, name=f"{name}_training_75")
+            training_all = model_training(df=self.data_all).activation()
+            training_75 = model_training(df=self.data_train_df).activation()
+            self.saving_model_file(training_all, name=f"{name}_training_all", upload_url=self.UPLOAD_URL)
+            self.saving_model_file(training_75, name=f"{name}_training_75", upload_url=self.UPLOAD_URL)
             return {"training_all":training_all, "training_75": training_75}
 
     def testing(self):
@@ -60,4 +65,18 @@ class ModelSystem:
                 list_model_info.append(info)
         
         return list_model_info
+    
+    def saving_model_file(self, model, name: str, upload_url: str):
+        model["name"] = name
+        json_bytes = json.dumps(model, indent=4).encode("utf-8")
+        files = {"file": (f"{name}.json", BytesIO(json_bytes), "application/json")}
+
+        try:
+            response = requests.post(upload_url, files=files)
+            response.raise_for_status()
+            print(f"Тhe model was successfully uploaded: {response.json()}")
+            return response.json()
+        except requests.RequestException as e:
+            print(f"Error sending model to server: {e}")
+            return {"error": str(e)}
             

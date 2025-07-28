@@ -50,29 +50,14 @@ class model_training:
                     model[target_variable][category][parameter] = (sum((df_parameter) &  (self.df[self.target_variable] == target_variable)) + 1) / (sum(self.df[self.target_variable] == target_variable) + k)
 
         return model
-    
-    def saving_model_file(self, model, name: str, upload_url: str):
-        model["name"] = name
-        json_bytes = json.dumps(model, indent=4).encode("utf-8")
-        files = {"file": (f"{name}.json", BytesIO(json_bytes), "application/json")}
-
-        try:
-            response = requests.post(upload_url, files=files)
-            response.raise_for_status()
-            print(f"Тhe model was successfully uploaded: {response.json()}")
-            return response.json()
-        except requests.RequestException as e:
-            print(f"Error sending model to server: {e}")
-            return {"error": str(e)}
 
     
-    def activation(self,upload_url:str,  name: str = "model") -> dict:
+    def activation(self) -> dict:
         """
-        Run the training, save the model as a JSON file.
+        Run the training.
         """
         self._target_variable_definition()
         model = self._training()
-        self.saving_model_file(model, name, upload_url)
         return model
 
 

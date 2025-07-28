@@ -37,3 +37,4 @@ class Upload:
                 return Upload()._upload_json(file)
 
         raise ValueError("Unsupported file type. Please upload a CSV or JSON file.")
+    
