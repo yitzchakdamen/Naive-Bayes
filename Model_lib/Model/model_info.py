@@ -1,13 +1,9 @@
 
 class ModelInfo:
-    """
-    Class to handle model information and predictions.
-    """
+    """Handle model information and predictions."""
 
     def get_model_info(self, nmodel: dict):
-        """
-        Returns the model information.
-        """
+        """Extract and return model info as dict."""
         columns_all = {}
         target_class = nmodel.get("target_variable", [])[0]
 

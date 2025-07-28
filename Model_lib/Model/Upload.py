@@ -5,9 +5,11 @@ import json
 class Upload:
     
     def _upload_csv(self, file_pat):
+        """Load a CSV file into a DataFrame."""
         return pd.read_csv(file_pat)
     
     def _upload_json(self, file_pat):
+        """Load a JSON file into a dict."""
         try:
             if isinstance(file_pat, str):
                 with open(file_pat, "r", encoding="utf-8") as file:
@@ -20,6 +22,7 @@ class Upload:
 
     @staticmethod
     def upload(file):
+        """Load a CSV or JSON file, or return dict/df."""
         if isinstance(file, dict):
             return file
         

@@ -4,28 +4,20 @@ import requests
 from io import BytesIO
 
 class model_training:
-    """
-    Class for training a Naive Bayes model on a pandas DataFrame.
-    """
+    """Train a Naive Bayes model on a DataFrame."""
 
     def __init__(self, df: pd.DataFrame, target_variable: str = "target") -> None:
-        """
-        Initialize with a DataFrame and the name of the target variable.
-        """
+        """Initialize with DataFrame and target variable."""
         self.target_variable: str = target_variable
         self.df: pd.DataFrame = df
 
     def _target_variable_definition(self) -> None:
-        """
-        Define the target variable: count and unique values.
-        """
+        """Define target variable and its unique values."""
         self.num_target_variable: int = self.df[self.target_variable].size
         self.list_target_variable = list(self.df[self.target_variable].unique())
 
     def _training(self) -> dict:
-        """
-        Train the Naive Bayes model and return it as a dictionary.
-        """
+        """Train the Naive Bayes model and return as dict."""
         model = {
             "columns": list(self.df.columns),
             "target_variable": self.list_target_variable,
@@ -53,9 +45,7 @@ class model_training:
 
     
     def activation(self) -> dict:
-        """
-        Run the training.
-        """
+        """Run training and upload model."""
         self._target_variable_definition()
         model = self._training()
         return model
@@ -63,29 +53,21 @@ class model_training:
 
 
 class Prediction:
-    """
-    Class for making predictions using a trained Naive Bayes model.
-    """
+    """Make predictions using a trained Naive Bayes model."""
 
     def __init__(self, modl: dict, parameters: dict = {}, values: list = []) -> None:
-        """
-        Initialize with a model and parameters or values for prediction.
-        """
+        """Initialize with model and prediction parameters."""
         self.modl = modl
         self.parameters: dict = self.preparation(parameters, values)
         
     def preparation(self, parameters: dict = {}, values: list = []) -> dict:
-        """
-        Prepare the parameters dictionary for prediction.
-        """
+        """Prepare parameters for prediction."""
         if parameters: return parameters
         elif values: return dict(zip([col for col in self.modl["columns"] ], values))
         else: raise
         
     def activation(self) -> dict:
-        """
-        Perform prediction and return the probabilistic result.
-        """
+        """Perform prediction and return result."""
         yes = no = 1
 
         for category in self.parameters:
@@ -104,21 +86,15 @@ class Prediction:
     
 
 class model_testing:
-    """
-    Class for evaluating the performance of a Naive Bayes model on a dataset.
-    """
+    """Evaluate a Naive Bayes model on a dataset."""
 
     def __init__(self, df: pd.DataFrame, model: dict) -> None:
-        """
-        Initialize with a DataFrame and a model for testing.
-        """
+        """Initialize with DataFrame and model."""
         self.df = df
         self.model = model
         
     def run(self) -> dict:
-        """
-        Run model evaluation and return performance metrics (accuracy, precision, recall, F1).
-        """
+        """Evaluate model and return metrics."""
         TP = TN = FP = FN = 0
 
         for _, row in self.df.iterrows():

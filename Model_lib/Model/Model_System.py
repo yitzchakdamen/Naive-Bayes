@@ -11,6 +11,7 @@ from io import BytesIO
 
 
 class ModelSystem:
+    """System for managing model training, testing, and info."""
     
     MODELS_DIR = "./models"
     UPLOAD_URL = "http://main:8888/upload/"
@@ -18,17 +19,21 @@ class ModelSystem:
     GET_INFO_URL = "http://main:8888/models_info/"
 
     def __init__(self) -> None:
+        """Initialize the ModelSystem object."""
         pass
         
     def upload_data(self, file, target_variable:str, str_yes:str, str_no:str, columns=None):
+        """Load and clean data for training/testing."""
         data:pd.DataFrame = cast(pd.DataFrame, Upload.upload(file))
         self.data_dict: dict = Clean(df=data, target_variable=target_variable, str_yes=str_yes, str_no=str_no, columns=columns).activation()
     
     def upload_model(self, file):
+        """Load a model from file."""
         data:dict = cast(dict, Upload.upload(file))
         self.nmodel = data
 
     def upload_prepared(self):
+        """Prepare data for training/testing."""
         if hasattr(self, "data_dict" ):
             if self.data_dict:
                 self.data_all = self.data_dict["all"]
@@ -38,6 +43,7 @@ class ModelSystem:
         return False
     
     def training(self, name:str):
+        """Train models on all and train data."""
         if self.upload_prepared():
             training_all = model_training(df=self.data_all).activation()
             training_75 = model_training(df=self.data_train_df).activation()
@@ -46,15 +52,18 @@ class ModelSystem:
             return {"training_all":training_all, "training_75": training_75}
 
     def testing(self):
+        """Test the model on test data."""
         if self.upload_prepared() and hasattr(self, "nmodel"):
             training = model_testing(df=self.data_test_df, model=self.nmodel).run()
             return training
 
     def prediction(self, values=[], parameters={}):
+        """Make a prediction using the loaded model."""
         if hasattr(self, "nmodel"):
             return Prediction( modl=self.nmodel, values=values, parameters=parameters).activation()
 
     def get_info(self):
+        """Get info for all models in the models directory."""
         model_info = ModelInfo()
         list_model_info = [] 
         

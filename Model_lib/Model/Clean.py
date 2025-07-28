@@ -3,8 +3,10 @@ from sklearn.model_selection import train_test_split
 
 
 class Clean:
+    """Clean and split data for training/testing."""
 
     def __init__(self, df:pd.DataFrame, target_variable:str, str_yes:str, str_no:str, columns=None) -> None:
+        """Initialize with DataFrame and cleaning params."""
         self.target_variable = target_variable.strip()
         self.df:pd.DataFrame = df
         self.yes = str_yes.strip()
@@ -12,11 +14,13 @@ class Clean:
         self.columns = columns
         
     def activation(self) -> dict:
+        """Clean and split the data."""
         if self._clean():
             return self._df_split()
         else: return {}
         
     def _clean(self):
+        """Clean columns and map target values."""
         # self.df = self.df.fillna("missing")
         
         self.df = self.df.astype(str)
@@ -43,6 +47,7 @@ class Clean:
         return False
     
     def _df_split(self):
+        """Split data into train and test sets."""
         train_df, test_df = train_test_split(
             self.df,
             test_size=0.25,         # 25% לבדיקה
